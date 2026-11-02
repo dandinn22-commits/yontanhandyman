@@ -1,0 +1,15 @@
+# מנועי חיפוש ומנועים מבוססי בינה מלאכותית: מותר במפורש
+User-agent: *
+User-agent: GPTBot
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: Google-Extended
+User-agent: PerplexityBot
+User-agent: ClaudeBot
+User-agent: Claude-SearchBot
+User-agent: Bingbot
+Allow: /
+Disallow: /thank-you.html
+Disallow: /tools/
+
+Sitemap: https://yonatan-handyman.co.il/sitemap.xml
