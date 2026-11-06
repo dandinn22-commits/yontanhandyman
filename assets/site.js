@@ -69,7 +69,7 @@
         btn.textContent = btnText;
         errBox.textContent = '';
         errBox.appendChild(document.createTextNode('השליחה לא עברה. '));
-        var msg = 'היי יונתן, אני ' + name + ' (' + phone + ')' + (city ? ' מ' + city : '') + '. אני צריך: ' + job;
+        var msg = 'היי יונתן, אני ' + name + ' (' + phone + ')' + (city ? ' מ' + city : '') + '. אני צריך הנדימן' + (job ? ': ' + job : '') + '.';
         var wa = document.createElement('a');
         wa.href = 'https://wa.me/' + S.wa + '?text=' + encodeURIComponent(msg);
         wa.target = '_blank'; wa.rel = 'noopener';

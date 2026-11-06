@@ -11,6 +11,7 @@ ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 import config as C
 from cities import CITIES
+from cities_extra import EXTRA
 from guides import GUIDES
 
 D = C.DOMAIN
@@ -269,13 +270,10 @@ def page(title, desc, path, content, extra='', robots=None, og='website', wa_tex
 '''
 
 
-def ticket(fid, source, city='', job='', sub='השאירו פרטים, ויונתן יחזור אליכם עם מחיר.', title='כרטיס עבודה', hid='', page_id=False):
-    jobs = ''.join('<option%s>%s</option>' % (' selected' if o == job else '', o) for o in C.JOB_OPTIONS)
-    def opt(c):
-        return '<option%s>%s</option>' % (' selected' if c['name'] == city else '', c['name'])
-    main = ''.join(opt(c) for c in CITIES if c['main'])
-    more = ''.join(opt(c) for c in CITIES if not c['main'])
-    ph = '' if city else ' selected'
+def ticket(fid, source, city='', job='', sub='השאירו שם וטלפון, ויונתן יחזור אליכם עם מחיר.', title='קבלו מחיר לעבודה', hid='', page_id=False):
+    ph = '' if job else ' selected'
+    jobs = '<option value=""%s>בחרו סוג עבודה</option>' % ph + ''.join('<option%s>%s</option>' % (' selected' if o == job else '', o) for o in C.JOB_OPTIONS)
+    city_in = '<input type="hidden" name="city" value="%s">' % esc(city) if city else ''
     t_id = fid + '-title'
     return f'''<form class="ticket lead-form" id="{fid}" data-source="{source}" aria-labelledby="{t_id}" novalidate>
   <div class="ticket-head">
@@ -283,16 +281,15 @@ def ticket(fid, source, city='', job='', sub='השאירו פרטים, ויונ�
     <span class="ticket-no">חוזרים אליכם עם מחיר</span>
   </div>
   <p class="ticket-sub">{sub}</p>
-  <label for="{fid}-job">סוג העבודה</label>
-  <select id="{fid}-job" name="job">{jobs}</select>
-  <label for="{fid}-city">עיר</label>
-  <select id="{fid}-city" name="city" autocomplete="address-level2"><option value="" disabled{ph}>בחרו עיר</option><optgroup label="ערים עיקריות">{main}</optgroup><optgroup label="ערים נוספות">{more}</optgroup><option value="אחר">עיר אחרת</option></select>
   <label for="{fid}-name">שם</label>
   <input id="{fid}-name" name="name" type="text" placeholder="השם שלכם" autocomplete="given-name" maxlength="60" required aria-describedby="{fid}-e-name">
   <span class="err field-err err-name" id="{fid}-e-name" hidden>נא למלא שם</span>
   <label for="{fid}-phone">טלפון</label>
   <input id="{fid}-phone" name="phone" type="tel" inputmode="tel" placeholder="050-0000000" autocomplete="tel" maxlength="20" required aria-describedby="{fid}-e-phone" dir="ltr">
   <span class="err field-err err-phone" id="{fid}-e-phone" hidden>נא למלא מספר טלפון תקין, לדוגמה 050-1234567</span>
+  <label for="{fid}-job">סוג העבודה <span class="opt">(לא חובה)</span></label>
+  <select id="{fid}-job" name="job">{jobs}</select>
+  {city_in}
   <input type="text" name="_honey" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
   <div class="form-error" role="alert" hidden></div>
   <button type="submit" class="btn btn-call wide" data-cta="form-{fid}">שלחו לי מחיר</button>
@@ -315,9 +312,12 @@ def chips():
 </ul>'''
 
 
-def service_cards():
+def service_cards(texts=None):
+    texts = texts or {}
     out = []
-    for key, name, text, alt, job, guide in C.SERVICES:
+    items = [x for x in C.SERVICES if x[0] in texts] + [x for x in C.SERVICES if x[0] not in texts]
+    for key, name, text, alt, job, guide in items:
+        text = texts.get(key, text)
         if os.path.exists(os.path.join(ROOT, 'img/%s.webp' % key)):
             art = '<img class="svc-img" src="/img/%s.webp" alt="%s" width="640" height="480" loading="lazy" decoding="async">' % (key, alt)
         else:
@@ -381,7 +381,7 @@ def quote_band(title, text, source, city='', job='', wa_text=None, section_id='q
       {cta_buttons('band', wa_text)}
       <p>אפשר גם במייל: <a class="mail mail-link" href="mailto:{C.EMAIL}">{C.EMAIL}</a></p>
     </div>
-    {ticket(section_id, source, city, job, sub='השאירו שם וטלפון, ויונתן יחזור אליכם עם מחיר ומועד.', title='קבלו מחיר')}
+    {ticket(section_id, source, city, job, sub='השאירו שם וטלפון, ויונתן יחזור אליכם עם מחיר ומועד.', title='קבלו מחיר לעבודה')}
   </div></div>
 </section>'''
 
@@ -498,8 +498,9 @@ def build_home():
 
 
 def build_cities():
-    general = [C.FAQ[2], C.FAQ[3], C.FAQ[5]]
+    general = [C.FAQ[2]]
     for c in CITIES:
+        x = EXTRA[c['slug']]
         path = '/%s/' % c['slug']
         title = 'הנדימן %s – תלייה, הרכבה ותיקונים | %s' % (c['in'], C.BRAND)
         desc = c['desc']
@@ -507,7 +508,8 @@ def build_cities():
         hoods = '<p class="hoods">מגיעים בין היתר ל: %s, ולשאר חלקי העיר.</p>' % ', '.join(c['hoods']) if c['hoods'] else ''
         local = ''.join('<div class="local-card"><h3>%s</h3><p>%s</p></div>' % x for x in c['local'])
         near = ''.join('<li><a href="/%s/">הנדימן %s</a></li>' % (s, CITY[s]['in']) for s in c['near'])
-        faqs = c['faq'] + general
+        faqs = c['faq'] + x['faq'] + general
+        about = ''.join('<p>%s</p>' % fill(t) for t in x['about'])
         content = f'''<div class="wrap"><nav class="breadcrumb" aria-label="מיקום באתר"><a href="/">דף הבית</a> / <span>הנדימן {c['in']}</span></nav></div>
 <section class="hero city-hero" aria-labelledby="h1">
   <div class="wrap hero-in">
@@ -523,7 +525,15 @@ def build_cities():
   </div>
 </section>
 
-<section class="section" id="local" aria-labelledby="local-h">
+<section class="section" id="about-city" aria-labelledby="about-city-h">
+  <div class="wrap narrow">
+    <h2 id="about-city-h">הנדימן {c['in']}: מה חשוב לדעת</h2>
+    <div class="city-about">{about}</div>
+    <p class="city-tip"><strong>טיפ לתושבי {c['name']}:</strong> {x['tip']}</p>
+  </div>
+</section>
+
+<section class="section alt" id="local" aria-labelledby="local-h">
   <div class="wrap">
     <h2 id="local-h">{c['local_title']}</h2>
     <div class="local-grid">{local}</div>
@@ -531,14 +541,14 @@ def build_cities():
   </div>
 </section>
 
-<section class="section alt" id="services" aria-labelledby="services-h">
+<section class="section" id="services" aria-labelledby="services-h">
   <div class="wrap">
     <h2 id="services-h">שירותי הנדימן {c['in']}</h2>
-    {service_cards()}
+    {service_cards(x['top'])}
   </div>
 </section>
 
-<section class="section" id="prices" aria-labelledby="prices-h">
+<section class="section alt" id="prices" aria-labelledby="prices-h">
   <div class="wrap">
     <h2 id="prices-h">כמה עולה הנדימן {c['in']}?</h2>
     <p class="answer narrow-text">ביקור עם עבודה קטנה {c['in']} מתחיל ב־{PRICE['small']}, ושעת עבודה לרשימת משימות מתחילה ב־{PRICE['hour']}. כמה עבודות באותו ביקור יוצאות זולות יותר, והמחיר נסגר לפני שמתחילים.</p>
@@ -547,7 +557,7 @@ def build_cities():
   </div>
 </section>
 
-<section class="section alt" id="faq" aria-labelledby="faq-h">
+<section class="section" id="faq" aria-labelledby="faq-h">
   <div class="wrap narrow">
     <h2 id="faq-h">שאלות נפוצות על הנדימן {c['in']}</h2>
     {faq_html(faqs)}

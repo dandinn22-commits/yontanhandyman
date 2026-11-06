@@ -287,3 +287,6 @@ html.mark-links a{text-decoration:underline!important;outline:1px dashed current
 .article a.btn-call{color:var(--on-orange)}
 .article a.btn-wa{color:#fff}
 .hrs{direction:ltr;unicode-bidi:isolate;white-space:nowrap}
+.opt{font-weight:400;color:var(--muted);font-size:.9em}
+.city-about{display:flex;flex-direction:column;gap:12px;font-size:17px}
+.city-tip{margin-top:16px;background:var(--tint);border-inline-start:4px solid var(--orange);border-radius:8px;padding:14px 18px}
