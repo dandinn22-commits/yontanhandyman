@@ -2,7 +2,7 @@
 """כל הפרטים של העסק במקום אחד. אחרי שינוי מריצים מתיקיית האתר: python3 tools/build.py"""
 
 BRAND = 'יונתן הנדימן'
-DOMAIN = 'https://yonatan-handyman.co.il'
+DOMAIN = 'https://yonatanhandyman.com'
 LAST_UPDATED = '2026-11-02'
 LAST_UPDATED_HE = '2 בנובמבר 2026'
 PRICES_MONTH_HE = 'נובמבר 2026'

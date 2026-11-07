@@ -12,4 +12,4 @@ Allow: /
 Disallow: /thank-you.html
 Disallow: /tools/
 
-Sitemap: https://yonatan-handyman.co.il/sitemap.xml
+Sitemap: https://yonatanhandyman.com/sitemap.xml
