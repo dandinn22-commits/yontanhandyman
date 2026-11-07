@@ -23,6 +23,8 @@ ACCESS_COORDINATOR = ''
 SHEET_ENDPOINT = ''
 
 # מדידה: גוגל אדס ואנליטיקס. כל עוד ריק, לא נטען שום קוד של גוגל.
+# מנהל התגים של גוגל. נטען בכל העמודים.
+GTM_ID = 'GTM-MHGQPGLN'
 ADS_ID = ''          # לדוגמה AW-123456789
 GA4_ID = ''          # לדוגמה G-ABC123
 ADS_LABELS = {'form': '', 'call': '', 'whatsapp': ''}

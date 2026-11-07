@@ -142,6 +142,13 @@ def head(title, desc, path, extra='', robots='index, follow, max-image-preview:l
     url = D + path
     site = {'leadEmail': C.LEAD_EMAIL, 'leadCc': C.LEAD_CC, 'sheet': C.SHEET_ENDPOINT, 'ads': C.ADS_ID, 'ga4': C.GA4_ID,
             'labels': C.ADS_LABELS, 'phone': C.PHONE, 'tel': C.PHONE_INTL, 'wa': WA_NUM}
+    gtm = ""
+    if getattr(C, 'GTM_ID', ''):
+        gtm = ("<!-- Google Tag Manager -->\n<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':\n"
+               "new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],\n"
+               "j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=\n"
+               "'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);\n"
+               "})(window,document,'script','dataLayer','%s');</script>\n<!-- End Google Tag Manager -->\n") % C.GTM_ID
     gid = C.ADS_ID or C.GA4_ID
     gtag = '<script async src="https://www.googletagmanager.com/gtag/js?id=%s"></script>\n' % gid if gid else ''
     v = css_version()
@@ -150,7 +157,7 @@ def head(title, desc, path, extra='', robots='index, follow, max-image-preview:l
 <html lang="he" dir="rtl">
 <head>
 <meta charset="utf-8">
-<script>window.SITE={json.dumps(site, ensure_ascii=False)};</script>
+{gtm}<script>window.SITE={json.dumps(site, ensure_ascii=False)};</script>
 {gtag}<script src="/assets/tracking.js?v={v}"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>{t}</title>
@@ -183,6 +190,13 @@ def head(title, desc, path, extra='', robots='index, follow, max-image-preview:l
 <link rel="stylesheet" href="/assets/site.css?v={v}">
 {extra}
 </head>'''
+
+
+def gtm_body():
+    if not getattr(C, 'GTM_ID', ''):
+        return ''
+    return ('<!-- Google Tag Manager (noscript) -->\n<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=%s" '
+            'height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>\n<!-- End Google Tag Manager (noscript) -->\n') % C.GTM_ID
 
 
 def header():
@@ -255,7 +269,7 @@ def page(title, desc, path, content, extra='', robots=None, og='website', wa_tex
         scripts += '\n<script src="/assets/tools-bg.js?v=%s"></script>' % css_version()
     return head(title, desc, path, extra, og=og, **kw) + f'''
 <body>
-<div class="page">
+{gtm_body()}<div class="page">
 {tools}<a class="skip" href="#main">דילוג לתוכן הראשי</a>
 {header()}
 <main id="main">

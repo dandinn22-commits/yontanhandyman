@@ -18,6 +18,7 @@
 
   var GA4_EVENTS = { form: 'generate_lead', call: 'click_call', whatsapp: 'click_whatsapp' };
   window.trackConversion = function(kind, cta){
+    try { dataLayer.push({ event: GA4_EVENTS[kind] || kind, lead_type: kind, cta: cta || '', page_path: location.pathname, from_ads: !!window.fromAds }); } catch(e) {}
     try {
       if (S.ads && LABELS[kind]) gtag('event', 'conversion', { send_to: S.ads + '/' + LABELS[kind] });
       if (S.ga4) gtag('event', GA4_EVENTS[kind] || kind, { page_path: location.pathname, cta: cta || '' });
