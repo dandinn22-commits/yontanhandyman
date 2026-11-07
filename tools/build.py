@@ -13,6 +13,7 @@ import config as C
 from cities import CITIES
 from cities_extra import EXTRA
 from guides import GUIDES
+from landing import LANDINGS
 
 D = C.DOMAIN
 BIZ_ID = D + '/#business'
@@ -207,6 +208,7 @@ def header():
     </a>
     <nav class="nav" aria-label="ניווט ראשי">
       <a href="/#services">שירותים</a>
+      <a href="/ikea-assembly/">הרכבת רהיטים</a>
       <a href="/#prices">מחירון</a>
       <a href="/#areas">אזורי שירות</a>
       <a href="/guides/">מדריכים</a>
@@ -232,7 +234,7 @@ def footer():
       </div>
       <nav aria-label="אזורי שירות"><strong>אזורי שירות</strong><ul class="foot-cities">{cities}</ul></nav>
       <nav aria-label="מדריכים"><strong>מדריכים</strong><ul>{guides}<li><a href="/guides/">כל המדריכים</a></li></ul></nav>
-      <nav aria-label="מידע"><strong>מידע</strong><ul><li><a href="/accessibility.html">הצהרת נגישות</a></li><li><a href="/privacy.html">מדיניות פרטיות</a></li></ul></nav>
+      <nav aria-label="מידע"><strong>שירותים</strong><ul>{''.join('<li><a href="/%s/">%s</a></li>' % (l['slug'], l['nav']) for l in LANDINGS)}</ul><strong style="margin-top:14px">מידע</strong><ul><li><a href="/accessibility.html">הצהרת נגישות</a></li><li><a href="/privacy.html">מדיניות פרטיות</a></li></ul></nav>
     </div>
     <p class="foot-copy">© 2026 {C.BRAND} · עודכן לאחרונה: <time datetime="{C.LAST_UPDATED}">{C.LAST_UPDATED_HE}</time></p>
   </div>
@@ -341,7 +343,7 @@ def service_cards(texts=None):
   {art}
   <h3>{name}</h3>
   <p>{text}</p>
-  <div class="svc-links"><a href="#quote" data-job="{esc(job)}" data-cta="svc-{key}">קבלו מחיר</a><a href="/guides/{guide}/">{g['short']}</a></div>
+  <div class="svc-links"><a href="#quote" data-job="{esc(job)}" data-cta="svc-{key}">קבלו מחיר</a>{'<a href="/ikea-assembly/">הרכבה מאיקאה</a>' if key == 'furniture' else ''}<a href="/guides/{guide}/">{g['short']}</a></div>
 </article>''')
     return '<div class="services">%s</div>' % ''.join(out)
 
@@ -579,7 +581,7 @@ def build_cities():
       <p>ערים קרובות</p>
       <ul class="link-list">{near}<li><a href="/#areas">כל אזורי השירות</a></li></ul>
       <p>מדריכים שיעזרו לכם</p>
-      <ul class="link-list"><li><a href="/guides/how-much-handyman/">כמה עולה הנדימן?</a></li><li><a href="/guides/wall-types-drilling/">איך מזהים את סוג הקיר</a></li><li><a href="/guides/handyman-visit-checklist/">איך מתכוננים לביקור הנדימן</a></li></ul>
+      <ul class="link-list"><li><a href="/ikea-assembly/">הרכבת רהיטים מאיקאה</a></li><li><a href="/guides/how-much-handyman/">כמה עולה הנדימן?</a></li><li><a href="/guides/wall-types-drilling/">איך מזהים את סוג הקיר</a></li><li><a href="/guides/handyman-visit-checklist/">איך מתכוננים לביקור הנדימן</a></li></ul>
     </div>
   </div>
 </section>
@@ -647,6 +649,91 @@ def build_guides():
                'speakable': {'@type': 'SpeakableSpecification', 'cssSelector': ['.speak-lead']}}
         extra = graph(business(), art, faq_node(g['faq'], path), crumbs_node([('דף הבית', '/'), ('מדריכים', '/guides/'), (g['short'], path)]))
         write('guides/%s/index.html' % g['slug'], page(g['title'] + ' | ' + C.BRAND, g['desc'], path, content, extra, og='article'))
+
+
+def build_landings():
+    for L in LANDINGS:
+        path = '/%s/' % L['slug']
+        title = '%s | %s' % (L['title'], C.BRAND)
+        desc = L['desc']
+        wa = L['wa']
+        pr = {k: (n, p, t) for k, n, p, t in C.PRICES}
+        rows = ''.join('<tr><td>%s</td><td class="num">%d ₪</td><td>%s</td></tr>' % pr[k] for k in L['prices'])
+        what = ''.join('<div class="local-card"><h3>%s</h3><p>%s</p></div>' % x for x in L['what'])
+        why = ''.join('<div class="local-card"><h3>%s</h3><p>%s</p></div>' % x for x in L['why'])
+        steps = ''.join('<li><h3>%s</h3><p>%s</p></li>' % x for x in L['steps'])
+        prep = ''.join('<li>%s</li>' % x for x in L['prep'])
+        cities = ''.join('<li><a href="/%s/">הנדימן %s</a></li>' % (c, CITY[c]['in']) for c in L['cities'])
+        g = GUIDE[L['guide']]
+        content = f"""<div class="wrap"><nav class="breadcrumb" aria-label="מיקום באתר"><a href="/">דף הבית</a> / <a href="/#services">שירותים</a> / <span>{L['nav']}</span></nav></div>
+<section class="hero city-hero" aria-labelledby="h1">
+  <div class="wrap hero-in">
+    <div class="hero-copy">
+      <p class="eyebrow">{L['eyebrow']}</p>
+      <h1 id="h1">{L['h1']}</h1>
+      <p class="lead speak-lead">{fill(L['lead'])}</p>
+      {cta_buttons('hero', wa)}
+      {chips()}
+    </div>
+    {ticket('hero-form', 'טופס עליון – ' + L['nav'], job=L['job'], sub='כתבו מה קניתם, ויונתן יחזור אליכם עם מחיר ומועד להרכבה.')}
+  </div>
+</section>
+
+<section class="section" id="what" aria-labelledby="what-h">
+  <div class="wrap">
+    <h2 id="what-h">{L['what_title']}</h2>
+    <div class="local-grid">{what}</div>
+  </div>
+</section>
+
+<section class="section alt" id="prices" aria-labelledby="prices-h">
+  <div class="wrap">
+    <h2 id="prices-h">כמה עולה {L['nav']}?</h2>
+    <p class="answer narrow-text">{fill(L['faq'][0][1])}</p>
+    <div class="table-wrap"><table class="prices"><caption>מחירון התחלתי (כולל מע״מ)</caption><thead><tr><th scope="col">עבודה</th><th scope="col">מחיר החל מ־</th><th scope="col">זמן עבודה משוער</th></tr></thead><tbody>{rows}</tbody></table></div>
+    <p class="fine">{L['price_note']}</p>
+    {cta_strip('שלחו את רשימת הרהיטים וקבלו מחיר סגור.', 'prices', wa)}
+  </div>
+</section>
+
+<section class="section" id="why" aria-labelledby="why-h">
+  <div class="wrap">
+    <h2 id="why-h">{L['why_title']}</h2>
+    <div class="local-grid">{why}</div>
+  </div>
+</section>
+
+<section class="section alt" id="how" aria-labelledby="how-h">
+  <div class="wrap">
+    <h2 id="how-h">{L['steps_title']}</h2>
+    <ol class="steps">{steps}</ol>
+    <h3 style="margin-top:20px">{L['prep_title']}</h3>
+    <ul class="checks narrow-text" style="margin:0;display:flex;flex-direction:column;gap:8px">{prep}</ul>
+    <p>רוצים לדעת מתי אפשר להרכיב לבד? קראו את <a href="/guides/{g['slug']}/" style="font-weight:700">{g['short']}: המדריך המלא</a>.</p>
+  </div>
+</section>
+
+<section class="section" id="faq" aria-labelledby="faq-h">
+  <div class="wrap narrow">
+    <h2 id="faq-h">שאלות נפוצות על {L['nav']}</h2>
+    {faq_html(L['faq'])}
+    <div class="related">
+      <p>{L['nav']} לפי עיר</p>
+      <ul class="link-list">{cities}<li><a href="/#areas">כל אזורי השירות</a></li></ul>
+    </div>
+    <p class="fine">{L['disclaimer']}</p>
+  </div>
+</section>
+
+{quote_band('רוצים שהרהיט יעמוד היום בערב?', 'שלחו בוואטסאפ מה קניתם, ותקבלו מחיר סגור ומועד להרכבה.', 'טופס תחתון – ' + L['nav'], job=L['job'], wa_text=wa)}"""
+        pr_all = [pr[k] for k in L['prices']]
+        svc = {'@type': 'Service', '@id': D + path + '#service', 'name': L['nav'], 'serviceType': 'הרכבת רהיטים', 'provider': {'@id': BIZ_ID},
+               'areaServed': [{'@type': 'City', 'name': c['name']} for c in CITIES], 'url': D + path, 'description': desc,
+               'offers': [{'@type': 'Offer', 'name': n, 'priceCurrency': 'ILS', 'price': p,
+                           'priceSpecification': {'@type': 'PriceSpecification', 'minPrice': p, 'priceCurrency': 'ILS', 'valueAddedTaxIncluded': True}} for n, p, _ in pr_all]}
+        extra = graph(business(), svc, webpage(path, title, desc, ['.speak-lead', '#prices .answer']), faq_node(L['faq'], path),
+                      crumbs_node([('דף הבית', '/'), ('שירותים', '/#services'), (L['nav'], path)]))
+        write(L['slug'] + '/index.html', page(title, desc, path, content, extra, wa_text=wa, bg=True))
 
 
 def contact_line(prefix):
@@ -728,7 +815,7 @@ def build_static():
 
 
 def build_seo():
-    urls = [('/', '1.0')] + [('/%s/' % c['slug'], '0.9' if c['main'] else '0.7') for c in CITIES] + [('/guides/', '0.7')] + \
+    urls = [('/', '1.0')] + [('/%s/' % l['slug'], '0.9') for l in LANDINGS] + [('/%s/' % c['slug'], '0.9' if c['main'] else '0.7') for c in CITIES] + [('/guides/', '0.7')] + \
            [('/guides/%s/' % g['slug'], '0.6') for g in GUIDES] + [('/accessibility.html', '0.2'), ('/privacy.html', '0.2')]
     rows = ''.join('  <url><loc>%s%s</loc><lastmod>%s</lastmod><priority>%s</priority></url>\n' % (D, u, C.LAST_UPDATED, p) for u, p in urls)
     write('sitemap.xml', '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n%s</urlset>\n' % rows)
@@ -765,6 +852,9 @@ ExpiresByType application/javascript "access plus 1 year"
     L += ['', '## שאלות נפוצות']
     for q, a in C.FAQ:
         L += ['### ' + q, plain(a), '']
+    L += ['## דפי שירות']
+    L += ['- [%s](%s/%s/): %s' % (l['title'], D, l['slug'], plain(l['lead'])) for l in LANDINGS]
+    L += ['']
     L += ['## מדריכים']
     L += ['- [%s](%s/guides/%s/): %s' % (g['title'], D, g['slug'], plain(g['lead'])) for g in GUIDES]
     L += ['', '## עמודי ערים']
@@ -804,7 +894,7 @@ def check_links():
 
 if __name__ == '__main__':
     build_css()
-    build_home(); build_cities(); build_guides(); build_static(); build_seo()
+    build_home(); build_landings(); build_cities(); build_guides(); build_static(); build_seo()
     bad = check_links()
     if bad:
         print('קישורים שבורים:'); print('\n'.join(bad)); sys.exit(1)
