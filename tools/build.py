@@ -208,7 +208,6 @@ def header():
     </a>
     <nav class="nav" aria-label="ניווט ראשי">
       <a href="/#services">שירותים</a>
-      <a href="/ikea-assembly/">הרכבת רהיטים</a>
       <a href="/#prices">מחירון</a>
       <a href="/#areas">אזורי שירות</a>
       <a href="/guides/">מדריכים</a>
@@ -234,7 +233,7 @@ def footer():
       </div>
       <nav aria-label="אזורי שירות"><strong>אזורי שירות</strong><ul class="foot-cities">{cities}</ul></nav>
       <nav aria-label="מדריכים"><strong>מדריכים</strong><ul>{guides}<li><a href="/guides/">כל המדריכים</a></li></ul></nav>
-      <nav aria-label="מידע"><strong>שירותים</strong><ul>{''.join('<li><a href="/%s/">%s</a></li>' % (l['slug'], l['nav']) for l in LANDINGS)}</ul><strong style="margin-top:14px">מידע</strong><ul><li><a href="/accessibility.html">הצהרת נגישות</a></li><li><a href="/privacy.html">מדיניות פרטיות</a></li></ul></nav>
+      <nav aria-label="מידע"><strong>שירותים</strong><ul>{''.join('<li><a href="/%s/">%s</a></li>' % (l['slug'], l['card']) for l in LANDINGS)}</ul><strong style="margin-top:14px">מידע</strong><ul><li><a href="/accessibility.html">הצהרת נגישות</a></li><li><a href="/privacy.html">מדיניות פרטיות</a></li></ul></nav>
     </div>
     <p class="foot-copy">© 2026 {C.BRAND} · עודכן לאחרונה: <time datetime="{C.LAST_UPDATED}">{C.LAST_UPDATED_HE}</time></p>
   </div>
@@ -341,9 +340,9 @@ def service_cards(texts=None):
         g = GUIDE[guide]
         out.append(f'''<article class="svc">
   {art}
-  <h3>{name}</h3>
+  <h3>{next(('<a href="/%s/" style="color:inherit">%s</a>' % (l['slug'], name) for l in LANDINGS if l['svc'] == key and l.get('main')), name)}</h3>
   <p>{text}</p>
-  <div class="svc-links"><a href="#quote" data-job="{esc(job)}" data-cta="svc-{key}">קבלו מחיר</a>{'<a href="/ikea-assembly/">הרכבה מאיקאה</a>' if key == 'furniture' else ''}<a href="/guides/{guide}/">{g['short']}</a></div>
+  <div class="svc-links"><a href="#quote" data-job="{esc(job)}" data-cta="svc-{key}">קבלו מחיר</a>{''.join('<a href="/%s/">%s</a>' % (l['slug'], l['card']) for l in LANDINGS if l['svc'] == key)}<a href="/guides/{guide}/">{g['short']}</a></div>
 </article>''')
     return '<div class="services">%s</div>' % ''.join(out)
 
@@ -675,7 +674,7 @@ def build_landings():
       {cta_buttons('hero', wa)}
       {chips()}
     </div>
-    {ticket('hero-form', 'טופס עליון – ' + L['nav'], job=L['job'], sub='כתבו מה קניתם, ויונתן יחזור אליכם עם מחיר ומועד להרכבה.')}
+    {ticket('hero-form', 'טופס עליון – ' + L['nav'], job=L['job'], sub=L['form_sub'])}
   </div>
 </section>
 
@@ -692,7 +691,7 @@ def build_landings():
     <p class="answer narrow-text">{fill(L['faq'][0][1])}</p>
     <div class="table-wrap"><table class="prices"><caption>מחירון התחלתי (כולל מע״מ)</caption><thead><tr><th scope="col">עבודה</th><th scope="col">מחיר החל מ־</th><th scope="col">זמן עבודה משוער</th></tr></thead><tbody>{rows}</tbody></table></div>
     <p class="fine">{L['price_note']}</p>
-    {cta_strip('שלחו את רשימת הרהיטים וקבלו מחיר סגור.', 'prices', wa)}
+    {cta_strip(L['strip'], 'prices', wa)}
   </div>
 </section>
 
@@ -721,13 +720,13 @@ def build_landings():
       <p>{L['nav']} לפי עיר</p>
       <ul class="link-list">{cities}<li><a href="/#areas">כל אזורי השירות</a></li></ul>
     </div>
-    <p class="fine">{L['disclaimer']}</p>
+    {'<p class="fine">%s</p>' % L['disclaimer'] if L.get('disclaimer') else ''}
   </div>
 </section>
 
-{quote_band('רוצים שהרהיט יעמוד היום בערב?', 'שלחו בוואטסאפ מה קניתם, ותקבלו מחיר סגור ומועד להרכבה.', 'טופס תחתון – ' + L['nav'], job=L['job'], wa_text=wa)}"""
+{quote_band(L['band'][0], L['band'][1], 'טופס תחתון – ' + L['nav'], job=L['job'], wa_text=wa)}"""
         pr_all = [pr[k] for k in L['prices']]
-        svc = {'@type': 'Service', '@id': D + path + '#service', 'name': L['nav'], 'serviceType': 'הרכבת רהיטים', 'provider': {'@id': BIZ_ID},
+        svc = {'@type': 'Service', '@id': D + path + '#service', 'name': L['nav'], 'serviceType': L['type'], 'provider': {'@id': BIZ_ID},
                'areaServed': [{'@type': 'City', 'name': c['name']} for c in CITIES], 'url': D + path, 'description': desc,
                'offers': [{'@type': 'Offer', 'name': n, 'priceCurrency': 'ILS', 'price': p,
                            'priceSpecification': {'@type': 'PriceSpecification', 'minPrice': p, 'priceCurrency': 'ILS', 'valueAddedTaxIncluded': True}} for n, p, _ in pr_all]}
