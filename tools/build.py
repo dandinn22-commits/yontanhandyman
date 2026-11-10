@@ -280,6 +280,7 @@ def page(title, desc, path, content, extra='', robots=None, og='website', wa_tex
 </div>
 {float_bits(wa_text)}
 {scripts}
+<script src="/lead-alerts.js?v=1" data-brand="יונתן הנדימן" defer></script>
 </body>
 </html>
 '''
