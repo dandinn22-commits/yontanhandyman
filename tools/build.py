@@ -209,6 +209,7 @@ def header():
     <nav class="nav" aria-label="ניווט ראשי">
       <a href="/#services">שירותים</a>
       <a href="/#prices">מחירון</a>
+      <a href="/#gallery">עבודות</a>
       <a href="/#areas">אזורי שירות</a>
       <a href="/guides/">מדריכים</a>
       <a href="/#faq">שאלות נפוצות</a>
@@ -402,6 +403,22 @@ def quote_band(title, text, source, city='', job='', wa_text=None, section_id='q
 </section>'''
 
 
+def gallery_section():
+    items = getattr(C, 'GALLERY', [])
+    if not items:
+        return ''
+    cards = ''.join('<figure class="gal-item"><img src="/img/gallery/%s" alt="%s" width="900" height="1200" loading="lazy" decoding="async"><figcaption>%s</figcaption></figure>' % (f, alt, cap) for f, cap, alt in items)
+    return f'''<section class="section alt" id="gallery" aria-labelledby="gallery-h">
+  <div class="wrap">
+    <h2 id="gallery-h">גלריית עבודות</h2>
+    <p class="section-lead">כמה מהעבודות שיונתן ביצע לאחרונה אצל לקוחות.</p>
+    <div class="gallery">{cards}</div>
+    {cta_strip('רוצים שגם אצלכם זה ייראה ככה?', 'gallery')}
+  </div>
+</section>
+'''
+
+
 def reviews_section():
     if not C.REVIEWS:
         return ''
@@ -452,7 +469,7 @@ def build_home():
   </div>
 </section>
 {reviews_section()}
-<section class="section" id="areas" aria-labelledby="areas-h">
+{gallery_section()}<section class="section" id="areas" aria-labelledby="areas-h">
   <div class="wrap">
     <h2 id="areas-h">באילו ערים {C.BRAND} עובד?</h2>
     <p class="answer narrow-text">{C.BRAND} נותן שירות בערי המרכז והשרון. הנה הערים העיקריות. גרים ביישוב סמוך? שלחו הודעה ובדרך כלל זה מסתדר.</p>
