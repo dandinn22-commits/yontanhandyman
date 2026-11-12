@@ -39,6 +39,7 @@ ART = {
  'curtains': f'<g {_S} stroke="{_N}"><path d="M22 16h76"/><path d="M28 16c0 22 4 42 12 60M46 16c0 22-2 42-6 60M92 16c0 22-4 42-12 60M74 16c0 22 2 42 6 60"/><circle cx="22" cy="16" r="2.5" stroke="{_O}"/><circle cx="98" cy="16" r="2.5" stroke="{_O}"/></g>',
  'walls': f'<g {_S} stroke="{_N}"><path d="M24 22h72M24 44h72M24 66h72M46 22v22M74 22v22M34 44v22M62 44v22M86 44v22"/><path d="M58 72l24-24 8 8-24 24H58z" stroke="{_O}" fill="#E9EEF7"/></g>',
  'bathroom': f'<g {_S} stroke="{_N}"><ellipse cx="60" cy="34" rx="20" ry="22"/><path d="M34 70h52M42 70v8M78 70v8"/><path d="M54 26l10 10" stroke="{_O}"/></g>',
+ 'balcony': f'<g {_S} stroke="{_N}"><path d="M24 70h72M30 70V40M90 70V40M24 40h72"/><path d="M38 40v30M54 40v30M66 40v30M82 40v30" stroke="{_O}"/><path d="M30 20l30-8 30 8"/></g>',
  'moving': f'<g {_S} stroke="{_N}"><path d="M26 38l34-14 34 14v32l-34 12-34-12z"/><path d="M26 38l34 12 34-12M60 50v32"/><path d="M42 31l34 13" stroke="{_O}"/></g>',
 }
 
@@ -92,7 +93,7 @@ def business(full=False):
          'logo': D + '/logo.png', 'image': D + '/og-image.jpg', 'priceRange': '₪₪', 'currenciesAccepted': 'ILS',
          'address': {'@type': 'PostalAddress', 'addressRegion': 'המרכז והשרון', 'addressCountry': 'IL'},
          'openingHoursSpecification': [
-             {'@type': 'OpeningHoursSpecification', 'dayOfWeek': ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday'], 'opens': '08:00', 'closes': '19:00'},
+             {'@type': 'OpeningHoursSpecification', 'dayOfWeek': ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday'], 'opens': '08:00', 'closes': '20:00'},
              {'@type': 'OpeningHoursSpecification', 'dayOfWeek': 'Friday', 'opens': '08:00', 'closes': '13:00'}],
          'areaServed': [{'@type': 'City', 'name': c['name'], 'url': '%s/%s/' % (D, c['slug'])} for c in CITIES]}
     if C.SAME_AS:
@@ -490,7 +491,7 @@ def build_home():
       <div><dt>טלפון</dt><dd><a class="num" data-cta="call-facts" href="{TEL}">{C.PHONE}</a></dd></div>
       <div><dt>מייל</dt><dd><a class="mail" href="mailto:{C.EMAIL}">{C.EMAIL}</a></dd></div>
       <div><dt>אזור שירות</dt><dd>המרכז והשרון</dd></div>
-      <div><dt>שעות פעילות</dt><dd>{hours('א׳–ה׳ 08:00–19:00')}<br>{hours('ו׳ 08:00–13:00')}</dd></div>
+      <div><dt>שעות פעילות</dt><dd>{hours('א׳–ה׳ 08:00–20:00')}<br>{hours('ו׳ 08:00–13:00')}</dd></div>
     </dl>
   </div>
 </section>
