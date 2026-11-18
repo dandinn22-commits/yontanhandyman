@@ -330,6 +330,14 @@ def chips():
 </ul>'''
 
 
+
+def page_fig(spec):
+    """תמונה להמחשה בדף שירות או במדריך. מוצגת רק אם הקובץ קיים ב-img/."""
+    if not spec or not os.path.exists(os.path.join(ROOT, 'img', spec[0])):
+        return ''
+    return ('<figure class="page-fig"><img src="/img/%s" alt="%s" width="640" height="480" loading="lazy" decoding="async">'
+            '<figcaption>תמונה להמחשה</figcaption></figure>' % (spec[0], spec[1]))
+
 def service_cards(texts=None):
     texts = texts or {}
     out = []
@@ -650,6 +658,7 @@ def build_guides():
 <h1>{g['title']}</h1>
 <p class="article-meta">מאת {C.BRAND} · עודכן ב־<time datetime="{C.LAST_UPDATED}">{C.LAST_UPDATED_HE}</time></p>
 <p class="lead speak-lead">{fill(g['lead'])}</p>
+{page_fig(g.get('img'))}
 <nav class="toc" aria-label="תוכן המדריך"><p>במדריך:</p><ol>{toc}<li><a href="#faq">שאלות נפוצות</a></li></ol></nav>
 {chr(10).join(secs)}
 <h2 id="faq">שאלות נפוצות</h2>
@@ -663,7 +672,7 @@ def build_guides():
 </article>
 {quote_band(g['cta'], 'שלחו רשימה ותמונה, ותקבלו מחיר סגור ומועד הגעה. יונתן עובד במרכז ובשרון.', 'טופס במדריך', job=g['job'])}'''
         art = {'@type': 'Article', '@id': D + path + '#article', 'headline': g['title'], 'description': g['desc'], 'datePublished': C.LAST_UPDATED, 'dateModified': C.LAST_UPDATED,
-               'inLanguage': 'he-IL', 'image': D + '/og-image.jpg', 'mainEntityOfPage': D + path, 'author': {'@id': BIZ_ID}, 'publisher': {'@id': BIZ_ID},
+               'inLanguage': 'he-IL', 'image': D + ('/img/' + g['img'][0] if page_fig(g.get('img')) else '/og-image.jpg'), 'mainEntityOfPage': D + path, 'author': {'@id': BIZ_ID}, 'publisher': {'@id': BIZ_ID},
                'speakable': {'@type': 'SpeakableSpecification', 'cssSelector': ['.speak-lead']}}
         extra = graph(business(), art, faq_node(g['faq'], path), crumbs_node([('דף הבית', '/'), ('מדריכים', '/guides/'), (g['short'], path)]))
         write('guides/%s/index.html' % g['slug'], page(g['title'] + ' | ' + C.BRAND, g['desc'], path, content, extra, og='article'))
@@ -700,6 +709,7 @@ def build_landings():
 <section class="section" id="what" aria-labelledby="what-h">
   <div class="wrap">
     <h2 id="what-h">{L['what_title']}</h2>
+    {page_fig(L.get('img'))}
     <div class="local-grid">{what}</div>
   </div>
 </section>
