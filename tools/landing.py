@@ -467,7 +467,7 @@ LANDINGS += [
    ('יונתן מתקן נזילות בצנרת?', 'לא. יונתן מחליף ברזים קיימים ואוטם בסיליקון. נזילה מתוך הקיר או החלפת צנרת הן עבודה לאינסטלטור מוסמך.'),
    ('באילו אזורים אתם עובדים?', ALL_CITIES_TEXT),
  ],
- 'guide': 'handyman-or-licensed-pro',
+ 'guide': 'shower-silicone-mold',
  'cities': ['handyman-tel-aviv', 'handyman-ramat-gan', 'handyman-givatayim', 'handyman-petah-tikva', 'handyman-raanana', 'handyman-netanya'],
  'band': ('הסיליקון במקלחון השחיר?', 'שלחו תמונה, ותקבלו מחיר סגור ומועד.'),
 },
