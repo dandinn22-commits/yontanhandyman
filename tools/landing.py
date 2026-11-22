@@ -294,7 +294,7 @@ LANDINGS += [
    ('צריך לקנות ברגים ודיבלים?', 'לא. יונתן מגיע עם ברגים, דיבלים ועוגנים. אתם קונים את המוט, המסילה או הווילון.'),
    ('באילו אזורים אתם עובדים?', ALL_CITIES_TEXT),
  ],
- 'guide': 'handyman-visit-checklist',
+ 'guide': 'curtain-rod-installation',
  'cities': ['handyman-tel-aviv', 'handyman-herzliya', 'handyman-rosh-haayin', 'handyman-kfar-saba', 'handyman-tel-mond', 'handyman-ramat-gan'],
  'band': ('נכנסתם לדירה וחסרים וילונות?', 'שלחו כמה חלונות יש, ותקבלו מחיר סגור לכל הבית.'),
 },
