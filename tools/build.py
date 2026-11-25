@@ -648,7 +648,7 @@ def build_guides():
         content = f'''<div class="wrap narrow"><nav class="breadcrumb" aria-label="מיקום באתר"><a href="/">דף הבית</a> / <a href="/guides/">מדריכים</a> / <span>{g['short']}</span></nav></div>
 <article class="article wrap narrow">
 <h1>{g['title']}</h1>
-<p class="article-meta">מאת {C.BRAND} · עודכן ב־<time datetime="{C.LAST_UPDATED}">{C.LAST_UPDATED_HE}</time></p>
+<p class="article-meta">מאת {C.BRAND} · עודכן ב־<time datetime="{g.get('date', C.LAST_UPDATED)}">{g.get('date_he', C.LAST_UPDATED_HE)}</time></p>
 <p class="lead speak-lead">{fill(g['lead'])}</p>
 <nav class="toc" aria-label="תוכן המדריך"><p>במדריך:</p><ol>{toc}<li><a href="#faq">שאלות נפוצות</a></li></ol></nav>
 {chr(10).join(secs)}
@@ -662,7 +662,7 @@ def build_guides():
 </div>
 </article>
 {quote_band(g['cta'], 'שלחו רשימה ותמונה, ותקבלו מחיר סגור ומועד הגעה. יונתן עובד במרכז ובשרון.', 'טופס במדריך', job=g['job'])}'''
-        art = {'@type': 'Article', '@id': D + path + '#article', 'headline': g['title'], 'description': g['desc'], 'datePublished': C.LAST_UPDATED, 'dateModified': C.LAST_UPDATED,
+        art = {'@type': 'Article', '@id': D + path + '#article', 'headline': g['title'], 'description': g['desc'], 'datePublished': g.get('date', C.LAST_UPDATED), 'dateModified': g.get('date', C.LAST_UPDATED),
                'inLanguage': 'he-IL', 'image': D + '/og-image.jpg', 'mainEntityOfPage': D + path, 'author': {'@id': BIZ_ID}, 'publisher': {'@id': BIZ_ID},
                'speakable': {'@type': 'SpeakableSpecification', 'cssSelector': ['.speak-lead']}}
         extra = graph(business(), art, faq_node(g['faq'], path), crumbs_node([('דף הבית', '/'), ('מדריכים', '/guides/'), (g['short'], path)]))
